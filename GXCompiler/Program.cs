@@ -1,4 +1,5 @@
 using GXCompiler.GXLexer;
+using GXCompiler.GXParser;
 
 namespace GXCompiler;
 
@@ -9,10 +10,9 @@ public static class Program {
 		Lexer lexer = new();
 
 		List<Token> tokens = lexer.Lex(content);
-		foreach (Token t in tokens)
-		{
-			Console.WriteLine($"{t.TokenType} / {t.Value} / {t.Line} / {t.Column}");
-		}
-		Console.WriteLine($"Lexed in {tokens.Count} tokens.");
+		
+		Parser parser = new(tokens);
+
+		Console.WriteLine(parser.Parse());
 	}
 }
