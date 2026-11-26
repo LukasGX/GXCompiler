@@ -35,8 +35,16 @@ public class Lexer()
             {
                 string number = "";
 
-                while (i < source.Length && char.IsDigit(source[i]))
+                int dots = 0;
+
+                while (i < source.Length && (char.IsDigit(source[i]) || source[i] == '.'))
                 {
+                    if (source[i] == '.')
+                        dots++;
+
+                    if (dots > 1)
+                        throw new Exception("Unknown character .");
+
                     number += source[i];
                     i++;
                 }
@@ -108,77 +116,264 @@ public class Lexer()
             {
                 string value = "";
 
-                i++;
-
-                if (i >= source.Length || source[i] != '/')
-                    throw new Exception($"Unknown character: {c}");
-
-                i++;
-
-                if (i < source.Length && source[i] == '/')
+                if (i < source.Length - 1 && source[i+1] == '=')
+                {
+                    tokens.Add(new Token(
+                        TokenType.DivideAssign,
+                        "/="
+                    ));
+                    i += 2;
+                    continue;
+                }
+                else if (i < source.Length - 1 && source[i+1] == '/')
                 {
                     i++;
 
-                    int slashes = 0;
-                    bool closed = false;
-
-                    while (i < source.Length)
+                    if (i < source.Length - 1 && source[i+1] == '/')
                     {
-                        if (source[i] == '/') slashes++;
-                        else slashes = 0;
+                        i++;
 
-                        if (slashes >= 3)
+                        int slashes = 0;
+                        bool closed = false;
+
+                        while (i < source.Length)
                         {
-                            closed = true;
+                            if (source[i] == '/') slashes++;
+                            else slashes = 0;
+
+                            if (slashes >= 3)
+                            {
+                                closed = true;
+                                i++;
+                                break;
+                            }
+
+                            value += source[i];
                             i++;
-                            break;
                         }
 
-                        value += source[i];
-                        i++;
+                        if (!closed)
+                            throw new Exception("Unterminated multi-line comment");
+
+                        value = value[..^2];
+
+                        tokens.Add(new Token(
+                            TokenType.Comment,
+                            value
+                        ));
+                        continue;
                     }
+                    else
+                    {
+                        while (i < source.Length && source[i] != '\n')
+                        {
+                            value += source[i];
+                            i++;
+                        }
 
-                    if (!closed)
-                        throw new Exception("Unterminated multi-line comment");
-
-                    value = value[..^2];
-
+                        tokens.Add(new Token(
+                            TokenType.Comment,
+                            value
+                        ));
+                        continue;
+                    }
+                }
+                else
+                {
                     tokens.Add(new Token(
-                        TokenType.Comment,
-                        value
+                        TokenType.Divide,
+                        "/"
                     ));
+                    continue;
+                }
+            }
+
+            if (c == '+' || c == '-' || c == '*' || c == '^')
+            {
+                if (i < source.Length - 1 && source[i+1] == '=')
+                {
+                    if (c == '+')
+                        tokens.Add(new Token(
+                            TokenType.PlusAssign,
+                            "+="
+                        ));
+                    else if (c == '-')
+                        tokens.Add(new Token(
+                            TokenType.MinusAssign,
+                            "-="
+                        ));
+                    else if (c == '*')
+                        tokens.Add(new Token(
+                            TokenType.MultiplyAssign,
+                            "*="
+                        ));
+                    else if (c == '^')
+                        tokens.Add(new Token(
+                            TokenType.PowerAssign,
+                            "^="
+                        ));
+                    i += 2;
                     continue;
                 }
                 else
                 {
-                    while (i < source.Length && source[i] != '\n')
-                    {
-                        value += source[i];
-                        i++;
-                    }
+                    if (c == '+')
+                        tokens.Add(new Token(
+                            TokenType.Plus,
+                            "+"
+                        ));
+                    else if (c == '-')
+                        tokens.Add(new Token(
+                            TokenType.Minus,
+                            "-"
+                        ));
+                    else if (c == '*')
+                        tokens.Add(new Token(
+                            TokenType.Multiply,
+                            "*"
+                        ));
+                    else if (c == '^')
+                        tokens.Add(new Token(
+                            TokenType.Power,
+                            "^"
+                        ));
+                    i++;
+                    continue;
+                }
+            }
 
+            if (c == '=')
+            {
+                if (i < source.Length - 2 && source[i+1] == '=' && source[i+2] == '=')
+                {
                     tokens.Add(new Token(
-                        TokenType.Comment,
-                        value
+                        TokenType.StrictEqual,
+                        "==="
                     ));
+                    i += 3;
+                    continue;
+                }
+                else if (i < source.Length - 1 && source[i+1] == '=')
+                {
+                    tokens.Add(new Token(
+                        TokenType.Equal,
+                        "=="
+                    ));
+                    i += 2;
+                    continue;
+                }
+                else
+                {
+                    tokens.Add(new Token(
+                        TokenType.Assign,
+                        "="
+                    ));
+                    i++;
+                    continue;
+                }
+            }
+
+            if (c == '!')
+            {
+                if (i < source.Length - 1 && source[i+1] == '=')
+                {
+                    tokens.Add(new Token(
+                        TokenType.NotEqual,
+                        "!="
+                    ));
+                    i += 2;
+                    continue;
+                }
+                else
+                {
+                    tokens.Add(new Token(
+                        TokenType.Not,
+                        "!"
+                    ));
+                    i++;
                     continue;
                 }
             }
 
             switch (c)
             {
-                case '+':
-                    tokens.Add(new Token(TokenType.Plus, "+"));
-                    i++;
-                    break;
-
-                case '=':
-                    tokens.Add(new Token(TokenType.Equals, "="));
-                    i++;
-                    break;
-
                 case ';':
-                    tokens.Add(new Token(TokenType.Semicolon, ";"));
+                    tokens.Add(new Token(
+                        TokenType.Semicolon,
+                        ";"
+                    ));
+                    i++;
+                    break;
+
+                case ',':
+                    tokens.Add(new Token(
+                        TokenType.Comma,
+                        ","
+                    ));
+                    i++;
+                    break;
+
+                case '.':
+                    tokens.Add(new Token(
+                        TokenType.Dot,
+                        "."
+                    ));
+                    i++;
+                    break;
+
+                case ':':
+                    tokens.Add(new Token(
+                        TokenType.Colon,
+                        ":"
+                    ));
+                    i++;
+                    break;
+
+                case '(':
+                    tokens.Add(new Token(
+                        TokenType.LeftParen,
+                        "("
+                    ));
+                    i++;
+                    break;
+
+                case ')':
+                    tokens.Add(new Token(
+                        TokenType.RightParen,
+                        ")"
+                    ));
+                    i++;
+                    break;
+
+                case '{':
+                    tokens.Add(new Token(
+                        TokenType.LeftBrace,
+                        "{"
+                    ));
+                    i++;
+                    break;
+
+                case '}':
+                    tokens.Add(new Token(
+                        TokenType.RightBrace,
+                        "}"
+                    ));
+                    i++;
+                    break;
+
+                case '[':
+                    tokens.Add(new Token(
+                        TokenType.LeftBracket,
+                        "["
+                    ));
+                    i++;
+                    break;
+
+                case ']':
+                    tokens.Add(new Token(
+                        TokenType.RightBracket,
+                        "]"
+                    ));
                     i++;
                     break;
 
