@@ -6,8 +6,36 @@ public enum TokenType
     Out,
     Shout,
     Exit,
+    If,
+    Else,
+    Switch,
+    Repeat,
+    Iterate,
+    While,
+    Class,
+    Init,
+    Entrypoint,
+    Method,
+    Private,
+    Return,
+    Inst,
+    Case,
+    New,
+    Using,
+    Try,
+    Treat,
+    Afterwards,
+    Ns,
+    Default,
+    Continue,
+    Break,
     Literal,
+    BoolLiteral,
+    Str,
     Int,
+    Dec,
+    Bool,
+    Rex,
     Number,
     Identifier,
     Plus,
@@ -18,6 +46,10 @@ public enum TokenType
     Equal,
     StrictEqual,
     NotEqual,
+    Lower,
+    LowerOrEqual,
+    Greater,
+    GreaterOrEqual,
     Not,
     Assign,
     PlusAssign,
@@ -29,6 +61,7 @@ public enum TokenType
     Comma,
     Dot,
     Colon,
+    Hashtag,
     LeftParen,
     RightParen,
     LeftBrace,
@@ -38,8 +71,10 @@ public enum TokenType
     EOF
 }
 
-public class Token(TokenType tokenType, string value)
+public class Token(TokenType tokenType, string value, int line, int column)
 {
     public TokenType TokenType = tokenType;
     public string Value = value;
+    public int Line = line;
+    public int Column = column;
 }

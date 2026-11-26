@@ -1,0 +1,4 @@
+entrypoint() {
+    str abc = "Hello World!";
+    out abc;
+}

@@ -7,5 +7,12 @@ public static class Program {
         string content = File.ReadAllText("program.gxc");
 
 		Lexer lexer = new();
+
+		List<Token> tokens = lexer.Lex(content);
+		foreach (Token t in tokens)
+		{
+			Console.WriteLine($"{t.TokenType} / {t.Value} / {t.Line} / {t.Column}");
+		}
+		Console.WriteLine($"Lexed in {tokens.Count} tokens.");
 	}
 }
