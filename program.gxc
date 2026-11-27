@@ -1,3 +1,4 @@
 entrypoint() {
-    out def;
+    bool abc = !true;
+    out abc;
 }

@@ -13,6 +13,7 @@ public static class Program {
 		
 		Parser parser = new(tokens);
 
-		Console.WriteLine(parser.Parse());
+		AstNode rootNode = parser.Parse();
+		rootNode.Display();
 	}
 }
