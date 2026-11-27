@@ -357,7 +357,7 @@ public class Parser(List<Token> tks)
                     xsn.Values.Add(new BoolLiteralNode(val));
                 }
                 else if (tk.TokenType == TokenType.Identifier)
-                    xsn.Values.Add(new IdentifierNode(expressionTokens[0].Value));
+                    xsn.Values.Add(new IdentifierNode(tk.Value));
                 else if (tk.TokenType == TokenType.Not)
                     xsn.Values.Add(new NotNode());
                 else
