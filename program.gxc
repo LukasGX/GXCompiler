@@ -1,4 +1,5 @@
 entrypoint() {
-    bool abc = !true;
-    out abc;
+    out "abc";
+    exit;
+    shout "abc";
 }

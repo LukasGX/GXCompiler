@@ -74,6 +74,9 @@ public class BlockNode : StatementNode
     }
 }
 
+// Comments
+public class CommentNode : StatementNode {}
+
 // Variable declaration
 public class VariableDeclarationNode(string type, string name, ExpressionNode expression) : StatementNode
 {
@@ -107,6 +110,27 @@ public class OutNode : StatementNode
     }
 }
 
+public class ShoutNode : StatementNode
+{
+    public ExpressionNode? Value { get; set; }
+
+    public override void Display(string indent = "", bool isLast = true)
+    {
+        Console.WriteLine($"{indent}{(isLast ? "└── " : "├── ")}ShoutNode");
+
+        Value?.Display(indent + (isLast ? "    " : "│   "), true);
+    }
+}
+
+public class ExitNode : StatementNode
+{
+
+    public override void Display(string indent = "", bool isLast = true)
+    {
+        Console.WriteLine($"{indent}{(isLast ? "└── " : "├── ")}ExitNode");
+    }
+}
+
 // Expressions
 public class LiteralNode(object value) : ExpressionNode
 {
@@ -135,6 +159,32 @@ public class BoolLiteralNode(bool value) : ExpressionNode
     public override void Display(string indent = "", bool isLast = true)
     {
         Console.WriteLine($"{indent}{(isLast ? "└── " : "├── ")}BoolLiteral: {Value}");
+    }
+}
+
+public class ArrayNode(string type, ExpressionNode[] elements) : ExpressionNode
+{
+    public string Type = type;
+    public ExpressionNode[] Elements = elements;
+
+    public override void Display(string indent = "", bool isLast = true)
+    {
+        Console.WriteLine($"{indent}{(isLast ? "└── " : "├── ")}ArrayNode");
+
+        string childIndent = indent + (isLast ? "    " : "│   ");
+
+        Console.WriteLine($"{childIndent}├── Type: {Type}");
+        Console.WriteLine($"{childIndent}└── Elements:");
+
+        string elementIndent = childIndent + "    ";
+
+        for (int i = 0; i < Elements.Length; i++)
+        {
+            Elements[i].Display(
+                elementIndent,
+                i == Elements.Length - 1
+            );
+        }
     }
 }
 
